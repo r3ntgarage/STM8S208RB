@@ -1,0 +1,22 @@
+#include "stm8s.h"
+#include "milis.h"
+
+uint8_t x = 0;
+
+void main(void){
+CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz z interního RC oscilátoru
+init_milis(); 
+GPIO_Init(GPIOC,GPIO_PIN_5,GPIO_MODE_OUT_PP_LOW_SLOW);
+GPIO_Init(GPIOE, GPIO_PIN_4,GPIO_MODE_IN_FL_NO_IT);
+
+  while (1){
+	if(GPIO_ReadInputPin(GPIOE,GPIO_PIN_4)== RESET){
+	for(x=0;x<5;x++){
+		delay_ms(1000);
+		GPIO_WriteHigh(GPIOC,GPIO_PIN_5);
+		delay_ms(1000);
+		GPIO_WriteLow(GPIOC,GPIO_PIN_5);
+	}
+	}
+  }
+}
