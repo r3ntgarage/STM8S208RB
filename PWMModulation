@@ -1,0 +1,45 @@
+/* vzorový projekt (sem pište stručný popis projektu)
+
+*/
+
+#include "stm8s.h"
+#include "milis.h"
+
+uint8_t pocitadlo = 0;
+uint8_t ref = 255;
+uint8_t x = 0;
+
+uint8_t minuly_stav=1; // zde si budeme ukládat minulý stav tlačítka (1=tlačítko stisknuté, 0=tlačítko uvolněné)
+uint8_t aktualni_stav=1;
+
+void main(void){
+CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz z interního RC oscilátoru
+init_milis();
+GPIO_Init(GPIOB,GPIO_PIN_0,GPIO_MODE_OUT_PP_LOW_SLOW);
+GPIO_Init(GPIOE, GPIO_PIN_4,GPIO_MODE_IN_FL_NO_IT);
+  while (1){
+   	 pocitadlo++;
+   	 for(x=0;x<50;x++)
+   	 
+   	 if(pocitadlo == 255){
+   		 pocitadlo = 0;
+   	 }
+   	 
+   	 if(pocitadlo < ref){
+   		 GPIO_WriteHigh(GPIOB, GPIO_PIN_0);
+   	 }
+   	 else{GPIO_WriteLow(GPIOB, GPIO_PIN_0);}
+   	 
+   	 if(GPIO_ReadInputPin(GPIOE,GPIO_PIN_4)==RESET){ // zjisti jestli je tlačítko stisknuté
+   		 aktualni_stav=1; // pokud ano ulož že je stisknuté
+   	 }
+   	 else{
+   		 aktualni_stav=0;// jinak ulož že je uvolněné
+   	 }
+   	 if(minuly_stav==1 && aktualni_stav==0){ // je to okamžik stisku ?
+   		 if(ref < 0){
+   			 ref = 255;
+   		 }
+   		 else{ref = ref - 10;}
+   	 }
+   	 minuly_stav = aktualni_stav;
